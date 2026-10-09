@@ -147,14 +147,11 @@
     </main>
 
     <script>
-      // URLs de producción del webhook del workflow «EOS · Documento a Google Sheet» en n8n.
-      // n8n publica el webhook en /webhook/<ruta>; la variante con el id del webhook queda como respaldo.
+      // URL de producción del webhook del workflow «EOS · Documento a Google Sheet» en n8n.
       // Se puede sobrescribir con ?webhook=<url> para probar con la URL de test.
-      const N8N = 'https://n8n-g3mx.srv1848372.hstgr.cloud'
-      const override = new URLSearchParams(location.search).get('webhook')
-      const WEBHOOK_URLS = override
-        ? [override]
-        : [N8N + '/webhook/eos-documento', N8N + '/webhook/6cadb263-4805-4c23-9fb5-23b5088784e8/eos-documento']
+      const WEBHOOK_URL =
+        new URLSearchParams(location.search).get('webhook') ||
+        'https://n8n-g3mx.srv1848372.hstgr.cloud/webhook/eos-documento'
       const MAX_BYTES = 20 * 1024 * 1024
       const ACCEPTED = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp']
       const FIELDS = [
@@ -246,16 +243,12 @@
         const body = new FormData()
         body.append('file', file, file.name)
 
-        let res = null
-        for (const url of WEBHOOK_URLS) {
-          try {
-            res = await fetch(url, { method: 'POST', body })
-            if (res.status !== 404) break
-          } catch (err) {
-            res = null
-          }
+        let res
+        try {
+          res = await fetch(WEBHOOK_URL, { method: 'POST', body })
+        } catch (err) {
+          return showError(li, 'No se pudo conectar con el servicio. Comprueba que el workflow de n8n está activo.')
         }
-        if (!res) return showError(li, 'No se pudo conectar con el servicio. Comprueba que el workflow de n8n está activo.')
         const data = await res.json().catch(() => ({}))
         if (!res.ok || !data.ok) {
           const detail = typeof data.error === 'string' ? data.error : 'Respuesta ' + res.status + ' del servidor.'
