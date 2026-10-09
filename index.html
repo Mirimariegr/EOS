@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <title>EOS · Contratos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --night: #1e1b4b;
+        --night-2: #312e81;
+        --sun-1: #fb923c;
+        --sun-2: #e11d48;
+        --gold: #fde68a;
+        --ink: #1c1917;
+        --muted: #78716c;
+        --line: #e7e5e4;
+        --bg: #fafaf9;
+        --card: #ffffff;
+        --ok: #047857;
+        --ok-bg: #ecfdf5;
+        --err: #be123c;
+        --err-bg: #fff1f2;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: 'DM Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      .hero {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(180deg, var(--night) 0%, var(--night-2) 100%);
+        color: #fff;
+        padding: 40px 16px 96px;
+      }
+      .hero::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: -220px;
+        width: 420px;
+        height: 420px;
+        transform: translateX(-50%);
+        border-radius: 50%;
+        background: radial-gradient(circle, var(--sun-1) 0%, var(--sun-2) 55%, transparent 72%);
+        opacity: 0.55;
+      }
+      .hero-inner { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; }
+      .brand { display: flex; align-items: center; gap: 10px; }
+      .brand img { width: 36px; height: 36px; }
+      .brand span {
+        font-family: 'Fraunces', Georgia, serif;
+        font-size: 28px;
+        letter-spacing: 0.08em;
+      }
+      .hero h1 { margin: 28px 0 8px; font-family: 'Fraunces', Georgia, serif; font-size: 30px; font-weight: 600; }
+      .hero p { margin: 0; max-width: 560px; color: #e0e7ff; line-height: 1.55; }
+      main { max-width: 760px; margin: -64px auto 0; padding: 0 16px 64px; position: relative; z-index: 2; }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 20px;
+        box-shadow: 0 12px 32px rgba(30, 27, 75, 0.12);
+      }
+      .drop {
+        display: flex; flex-direction: column; align-items: center; gap: 8px;
+        padding: 40px 16px;
+        border: 2px dashed #d6d3d1;
+        border-radius: 14px;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.15s, background 0.15s;
+      }
+      .drop:hover, .drop.over { border-color: var(--sun-1); background: #fff7ed; }
+      .drop strong { font-size: 16px; }
+      .drop span { color: var(--muted); font-size: 14px; }
+      button {
+        margin-top: 16px; width: 100%;
+        font: inherit; font-weight: 700;
+        padding: 12px; border: 0; border-radius: 12px;
+        background: linear-gradient(90deg, var(--sun-1), var(--sun-2));
+        color: #fff; cursor: pointer;
+      }
+      button:hover { filter: brightness(1.05); }
+      button:disabled { background: #d6d3d1; cursor: default; filter: none; }
+      #list { list-style: none; margin: 20px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+      #list li { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+      .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+      .name { font-weight: 700; overflow-wrap: anywhere; }
+      .badge {
+        flex-shrink: 0; font-size: 12px; font-weight: 700;
+        padding: 3px 10px; border-radius: 999px;
+        background: #f5f5f4; color: var(--muted);
+      }
+      .badge.ok { background: var(--ok-bg); color: var(--ok); }
+      .badge.err { background: var(--err-bg); color: var(--err); }
+      .badge.run { background: #fff7ed; color: #c2410c; }
+      .person {
+        margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--line);
+        font-weight: 700; font-size: 14px; color: var(--night);
+      }
+      dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 6px 0 0; font-size: 14px; }
+      dt { color: var(--muted); }
+      dd { margin: 0; overflow-wrap: anywhere; }
+      @media (max-width: 520px) {
+        dl { grid-template-columns: 1fr; gap: 0; }
+        dd { margin-bottom: 6px; }
+      }
+      .msg { margin: 10px 0 0; font-size: 14px; color: var(--err); }
+      footer { margin-top: 28px; font-size: 12px; color: var(--muted); text-align: center; }
+    </style>
+  </head>
+  <body>
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="brand"><img src="favicon.svg" alt="" /><span>EOS</span></div>
+        <h1>Extracción de datos de contratos</h1>
+        <p>
+          Sube los contratos en PDF (o una foto o escaneo). Se identifican todos los intervinientes y se añade una
+          fila por cada uno al Google Sheet con su DNI/NIE, nombre y dirección.
+        </p>
+      </div>
+    </section>
+
+    <main>
+      <form class="card" id="form">
+        <label class="drop" id="drop" for="file">
+          <strong>Arrastra los contratos aquí o pulsa para elegirlos</strong>
+          <span id="picked">PDF, JPG, PNG o WEBP · máximo 20 MB por archivo</span>
+        </label>
+        <input id="file" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" multiple hidden />
+
+        <button type="submit" id="send" disabled>Extraer datos</button>
+      </form>
+
+      <ul id="list"></ul>
+
+      <footer>Los contratos se procesan en n8n con Claude y solo se guardan en el Sheet los datos extraídos.</footer>
+    </main>
+
+    <script>
+      // URL de producción del webhook del workflow «EOS · Documento a Google Sheet» en n8n.
+      // Se puede sobrescribir con ?webhook=<url> para probar con la URL de test.
+      const WEBHOOK_URL =
+        new URLSearchParams(location.search).get('webhook') ||
+        'https://n8n-g3mx.srv1848372.hstgr.cloud/webhook/6cadb263-4805-4c23-9fb5-23b5088784e8/eos-documento'
+      const MAX_BYTES = 20 * 1024 * 1024
+      const ACCEPTED = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp']
+      const FIELDS = [
+        'DNI/NIE',
+        'DIRECCION PARTICULAR COMPLETA',
+        'POBLACION',
+        'PROVINCIA',
+        'PAIS',
+        'CODIGO POSTAL',
+      ]
+
+      const form = document.getElementById('form')
+      const drop = document.getElementById('drop')
+      const input = document.getElementById('file')
+      const picked = document.getElementById('picked')
+      const send = document.getElementById('send')
+      const list = document.getElementById('list')
+      let files = []
+
+      function setFiles(fileList) {
+        files = Array.from(fileList)
+        picked.textContent = files.length
+          ? files.map((f) => f.name).join(', ')
+          : 'PDF, JPG, PNG o WEBP · máximo 20 MB por archivo'
+        send.disabled = files.length === 0
+      }
+
+      input.addEventListener('change', () => setFiles(input.files))
+      ;['dragenter', 'dragover'].forEach((ev) =>
+        drop.addEventListener(ev, (e) => {
+          e.preventDefault()
+          drop.classList.add('over')
+        }),
+      )
+      ;['dragleave', 'drop'].forEach((ev) =>
+        drop.addEventListener(ev, (e) => {
+          e.preventDefault()
+          drop.classList.remove('over')
+        }),
+      )
+      drop.addEventListener('drop', (e) => setFiles(e.dataTransfer.files))
+
+      function addItem(name) {
+        const li = document.createElement('li')
+        li.innerHTML = '<div class="row"><span class="name"></span><span class="badge">En cola</span></div>'
+        li.querySelector('.name').textContent = name
+        list.prepend(li)
+        return li
+      }
+
+      function setStatus(li, text, kind) {
+        const badge = li.querySelector('.badge')
+        badge.textContent = text
+        badge.className = 'badge' + (kind ? ' ' + kind : '')
+      }
+
+      function showError(li, message) {
+        setStatus(li, 'Error', 'err')
+        const p = document.createElement('p')
+        p.className = 'msg'
+        p.textContent = message
+        li.appendChild(p)
+      }
+
+      function showRows(li, filas) {
+        setStatus(li, filas.length === 1 ? '1 fila añadida' : filas.length + ' filas añadidas', 'ok')
+        filas.forEach((fila) => {
+          const title = document.createElement('p')
+          title.className = 'person'
+          title.textContent = fila['NOMBRE INTERVINIENTE'] || 'Interviniente sin nombre'
+          const dl = document.createElement('dl')
+          FIELDS.forEach((key) => {
+            if (!fila[key]) return
+            const dt = document.createElement('dt')
+            dt.textContent = key
+            const dd = document.createElement('dd')
+            dd.textContent = fila[key]
+            dl.append(dt, dd)
+          })
+          li.append(title, dl)
+        })
+      }
+
+      async function upload(file, li) {
+        if (!ACCEPTED.includes(file.type)) return showError(li, 'Formato no soportado. Usa PDF, JPG, PNG o WEBP.')
+        if (file.size > MAX_BYTES) return showError(li, 'El archivo supera los 20 MB.')
+
+        setStatus(li, 'Procesando…', 'run')
+        const body = new FormData()
+        body.append('file', file, file.name)
+
+        try {
+          const res = await fetch(WEBHOOK_URL, { method: 'POST', body })
+          const data = await res.json().catch(() => ({}))
+          if (!res.ok || !data.ok) {
+            const detail = typeof data.error === 'string' ? data.error : 'Respuesta ' + res.status + ' del servidor.'
+            return showError(li, detail)
+          }
+          showRows(li, data.filas || [])
+        } catch (err) {
+          showError(li, 'No se pudo conectar con el servicio. Comprueba que el workflow de n8n está activo.')
+        }
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault()
+        const queue = files.map((f) => [f, addItem(f.name)])
+        send.disabled = true
+        input.value = ''
+        setFiles([])
+        for (const [file, li] of queue) await upload(file, li)
+      })
+    </script>
+  </body>
+</html>
