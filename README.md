@@ -2,7 +2,7 @@
 
 Página web para subir contratos (PDF o imagen) y volcar los datos de sus intervinientes en un Google Sheet.
 
-**Web:** https://mirimariegr.github.io/EOS/
+**Web:** https://mirimariegr.github.io/EOS/ (GitHub Pages desde `main`, carpeta raíz)
 
 ## Cómo funciona
 
