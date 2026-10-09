@@ -114,6 +114,13 @@
         dl { grid-template-columns: 1fr; gap: 0; }
         dd { margin-bottom: 6px; }
       }
+      .usage {
+        margin: 12px 0 0; padding-top: 10px; border-top: 1px dashed var(--line);
+        font-size: 13px; color: var(--muted);
+      }
+      .usage strong { color: var(--ink); }
+      #total { margin: 14px 0 0; font-size: 13px; color: var(--muted); text-align: right; }
+      #total strong { color: var(--ink); }
       .msg { margin: 10px 0 0; font-size: 14px; color: var(--err); }
       footer { margin-top: 28px; font-size: 12px; color: var(--muted); text-align: center; }
     </style>
@@ -142,6 +149,7 @@
       </form>
 
       <ul id="list"></ul>
+      <p id="total" hidden></p>
 
       <footer>Los contratos se procesan en n8n con Claude y solo se guardan en el Sheet los datos extraídos.</footer>
     </main>
@@ -170,6 +178,33 @@
       const send = document.getElementById('send')
       const list = document.getElementById('list')
       let files = []
+      const totals = { docs: 0, tokens: 0, coste: 0 }
+      const nf = new Intl.NumberFormat('es-ES')
+      const usd = (n) => n.toLocaleString('es-ES', { minimumFractionDigits: 4, maximumFractionDigits: 4 }) + ' $'
+
+      function showUsage(li, consumo) {
+        if (!consumo || !consumo.disponible) return
+        const p = document.createElement('p')
+        p.className = 'usage'
+        p.innerHTML =
+          'Tokens: <strong></strong> entrada · <strong></strong> salida · Coste: <strong></strong>'
+        const [a, b, c] = p.querySelectorAll('strong')
+        a.textContent = nf.format(consumo.tokens_entrada)
+        b.textContent = nf.format(consumo.tokens_salida)
+        c.textContent = usd(consumo.coste_usd)
+        li.appendChild(p)
+
+        totals.docs += 1
+        totals.tokens += consumo.tokens_total
+        totals.coste += consumo.coste_usd
+        const total = document.getElementById('total')
+        total.hidden = false
+        total.innerHTML = 'Total de esta sesión: <strong></strong> documentos · <strong></strong> tokens · <strong></strong>'
+        const [d, t, k] = total.querySelectorAll('strong')
+        d.textContent = totals.docs
+        t.textContent = nf.format(totals.tokens)
+        k.textContent = usd(totals.coste)
+      }
 
       function setFiles(fileList) {
         files = Array.from(fileList)
@@ -255,6 +290,7 @@
           return showError(li, detail)
         }
         showRows(li, data.filas || [])
+        showUsage(li, data.consumo)
       }
 
       form.addEventListener('submit', async (e) => {
